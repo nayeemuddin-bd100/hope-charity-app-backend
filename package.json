@@ -4,18 +4,29 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev --respawn --transpile-only src/server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "lint:check": "eslint --ignore-path .eslintignore --ext .js,.ts",
+    "lint:fix": "npm run lint:check --fix",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.5.0",
     "@types/cookie-parser": "^1.4.7",
+    "@types/eslint__js": "^8.42.3",
     "@types/node": "^20.14.6",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
     "cookie-parser": "^1.4.6",
+    "eslint": "^8.57.0",
+    "globals": "^15.6.0",
     "i": "^0.3.7",
     "npm": "^10.8.1",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.1"
   },
   "dependencies": {
     "@types/cors": "^2.8.17",
