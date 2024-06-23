@@ -2,8 +2,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import globalErrorHandler from './app/middleware/globalErrorHandler'
 import { userRoute } from './app/modules/user/user.route'
-// import globalErrorHandler from "./app/middleware/globalErrorHandler";
 // import routers from "./app/routes";
 
 const app: Application = express()
@@ -22,9 +22,6 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Hello World!')
 })
 
-//global Error handler
-// app.use(globalErrorHandler);
-
 //handle Not Found Route
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.NOT_FOUND).json({
@@ -40,5 +37,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   })
   next()
 })
+
+//global Error handler
+app.use(globalErrorHandler)
 
 export default app

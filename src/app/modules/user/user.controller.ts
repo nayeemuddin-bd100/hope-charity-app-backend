@@ -11,7 +11,7 @@ const createStudent = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUser(userData)
 
   sendResponse<IUser>(res, {
-    statusCode: StatusCodes.OK,
+    statusCode: StatusCodes.CREATED,
     success: true,
     message: 'User created successfully',
     data: result,
