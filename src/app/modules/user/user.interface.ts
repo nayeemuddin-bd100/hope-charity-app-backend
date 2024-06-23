@@ -14,3 +14,10 @@ export type IUser = {
 }
 
 export type UserModel = Model<IUser, Record<string, never>>
+
+export type IUserFilters = {
+  searchTerm?: string
+  id?: string
+  email?: string
+  role?: string
+}
