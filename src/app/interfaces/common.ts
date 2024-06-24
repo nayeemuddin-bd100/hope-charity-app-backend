@@ -14,3 +14,10 @@ export type IGenericMsgResponse = {
   message: string
   errorMessages: IGenericErrorMsg[]
 }
+
+export type IPaginationOptions = {
+  page?: number
+  limit?: number
+  sortBy?: 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
+}
