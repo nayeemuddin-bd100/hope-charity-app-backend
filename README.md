@@ -1,9 +1,11 @@
 # Requirement Analysis: Hope (Charity Management App)
 
 ## Introduction
+
 The purpose of this document is to outline the requirements for Hope, a charity management app that helps users donate to various causes, track their donations, attend various events, create blogs, and manage donations. The app serves as a platform to connect donors with causes and simplify the donation process.
 
 ## Objectives
+
 - Provide a user-friendly platform for making donations.
 - Ensure transparency and trust between donors and charities.
 - Facilitate easy tracking and management of donations.
@@ -12,6 +14,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 ## Functional Requirements
 
 ### Authentication
+
 - Registration and login system.
 - Users can reset their password by receiving a reset link via email.
 - Implement secure password hashing mechanisms to store user passwords.
@@ -19,6 +22,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - Token-based authorization (e.g., access token, refresh token).
 
 ### Admin
+
 - Admins can view, update, suspend, or delete user accounts.
 - Manage user roles and permissions.
 - Admins manage donor profiles.
@@ -28,22 +32,26 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - Admins can create, update, or manage causes and events to raise funds.
 
 ### Donor
+
 - Donors can create and manage personal profiles.
 - Donors can select causes to donate and attend events as well.
 - Track donation history and preferred causes.
 
 ### Volunteer
+
 - Volunteers can be assigned specific tasks for events.
 - Volunteers can participate in events.
 - Volunteers can create, update, and delete posts.
 
 ### Cause Listing
+
 - Allow admin or super admin to create/update/delete and manage causes.
 - Show cause progress such as title, description, goal amount, and raised amount with percentage.
 - Implement search options to navigate specific causes.
 - Implement pagination.
 
 ### Events Listing
+
 - Display campaign/event details with title, location, and time.
 - Every event must have specific volunteers.
 - Admins can assign tasks to volunteers for specific events or campaigns.
@@ -52,33 +60,39 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - Implement search option.
 
 ### Donor Listing
+
 - Display donor's details with name, email, and total donations.
 - Allow admin and super admin to manage donors.
 - Implement pagination.
 - Implement search option.
 
 ### Volunteer Listing
+
 - Display volunteer’s details with name and email.
 - Allow admin and super admin to manage volunteers.
 - Implement pagination.
 - Implement search option.
 
 ### Donation Progress
+
 - Support multiple payment methods (e.g., sslcommerce).
 - Automatically generate payment receipts after donations.
 - Send acknowledgment messages to donors after successful donations.
 
 ### Blog
+
 - Only admin and volunteer can post a blog.
 - Admin can delete the blog of a volunteer.
 
 ### Dashboard for Admin
+
 - Admin can manage volunteers in the dashboard.
 - Admin can add and manage causes in the dashboard.
 - Admin can add and manage events in the dashboard.
 - Admin can see analytics of donations.
 
 ## Technologies
+
 - **Database**: MongoDB with Mongoose for object modeling.
 - **Backend**: Node.js with Express.js for API development.
 - **Frontend**: Next.js for server-side rendered React applications.
@@ -89,6 +103,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 ## Database Design
 
 ### Database Relationship
+
 - **User - Donor/Volunteer/Admin Relationship (one-to-one relationship)**:
   - User should be linked with Donor/Volunteer/Admin through foreign key (donor_id, volunteer_id, admin_id).
 - **Volunteer - Event Relationship (many-to-many relationship)**:
@@ -109,7 +124,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 ### Database Schema
 
 #### Users
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - name
 - email
 - password
@@ -121,7 +137,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Admin
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - name
 - email
 - profileImage
@@ -134,7 +151,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Donor
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - name
 - email
 - profileImage
@@ -145,7 +163,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Volunteer
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - name
 - email
 - profileImage
@@ -157,7 +176,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Event
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - title
 - description
 - location
@@ -170,7 +190,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Blog
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - title
 - description
 - image
@@ -179,7 +200,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Donation
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - amount
 - date
 - donorId (foreign key)
@@ -188,7 +210,8 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - updatedAt
 
 #### Cause
-- _id (Primary Key)
+
+- \_id (Primary Key)
 - title
 - description
 - goalAmount
@@ -196,3 +219,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - createdBy: adminId (foreign key)
 - createdAt
 - updatedAt
+
+## ERD Diagram
+
+![ERD Diagram](./ERD_charity-management-app.drawio.png)
