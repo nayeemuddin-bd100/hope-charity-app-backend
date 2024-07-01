@@ -144,6 +144,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - profileImage
 - contactNo
 - address
+- userId (foreign key)
 - causeId[] (foreign key)
 - eventId[] (foreign key)
 - blogId[] (foreign key)
@@ -158,6 +159,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - profileImage
 - contactNo
 - address
+- userId (foreign key)
 - donationId[] (foreign key)
 - createdAt
 - updatedAt
@@ -170,6 +172,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - profileImage
 - contactNo
 - address
+- userId (foreign key)
 - eventId[] (foreign key)
 - blogId[] (foreign key)
 - createdAt
