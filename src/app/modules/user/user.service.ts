@@ -7,15 +7,19 @@ import { ISearchTerm, searchHelper } from '../../../helper/searchHelper'
 import { IGenericResponse, IPaginationOptions } from '../../interfaces/common'
 import { IAdmin } from '../admin/admin.interface'
 import { Admin } from '../admin/admin.model'
+import { IDonor } from '../donor/donor.interface'
+import { Donor } from '../donor/donor.model'
+import { IVolunteer } from '../volunteer/volunteer.interface'
+import { Volunteer } from '../volunteer/volunteer.model'
 import { userSearchableFields } from './user.constant'
-import { IUser, IUserFilters, UserData } from './user.interface'
+import { IUser, IUserData, IUserFilters } from './user.interface'
 import { User } from './user.model'
 
-const createUser = async (userData: UserData): Promise<IUser | null> => {
+const createUser = async (userData: IUserData): Promise<IUser | null> => {
   // check if user already exists
   const isUserExist = await User.findOne({ email: userData.email })
   if (isUserExist) {
-    throw new ApiError(StatusCodes.CONFLICT, 'User already exist')
+    throw new ApiError(StatusCodes.CONFLICT, 'Email is already exist')
   }
 
   let newUser = null
@@ -32,7 +36,7 @@ const createUser = async (userData: UserData): Promise<IUser | null> => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user')
     }
 
-    const newUserData: Partial<IAdmin> = {
+    const newUserData: Partial<IAdmin | IVolunteer | IDonor> = {
       name: {
         firstName: userData.name.firstName,
         lastName: userData.name.lastName,
@@ -66,13 +70,13 @@ const createUser = async (userData: UserData): Promise<IUser | null> => {
 
     if (userData.role === 'admin') {
       await createParticipant(Admin)
+    } else if (userData.role === 'volunteer') {
+      await createParticipant(Volunteer)
+    } else if (userData.role === 'donor') {
+      await createParticipant(Donor)
     } else {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role')
     }
-
-    // else if(userData.role === 'volunteer'){
-    //   await createParticipant(Volunteer)
-    // }
 
     await session.commitTransaction()
     session.endSession()

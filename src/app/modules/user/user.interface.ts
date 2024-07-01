@@ -1,5 +1,7 @@
 import { Model, Types } from 'mongoose'
 import { IAdmin } from '../admin/admin.interface'
+import { IDonor } from '../donor/donor.interface'
+import { IVolunteer } from '../volunteer/volunteer.interface'
 
 export type IUser = {
   name: {
@@ -10,8 +12,8 @@ export type IUser = {
   password: string
   role: 'admin' | 'super-admin' | 'volunteer' | 'donor'
   admin?: Types.ObjectId | IAdmin
-  // donorId?:Types.ObjectId | IDonor
-  // volunteerId?: Types.ObjectId | IDonor
+  donor?: Types.ObjectId | IDonor
+  volunteer?: Types.ObjectId | IVolunteer
   createdAt: Date
   updatedAt: Date
 }
@@ -25,5 +27,4 @@ export type IUserFilters = {
   role?: string
 }
 
-export type UserData = IUser & Partial<IAdmin>
-// export type UserData = IUser & Partial<IAdmin | IDonor | IVolunteer>
+export type IUserData = IUser & Partial<IAdmin | IDonor | IVolunteer>
