@@ -8,7 +8,7 @@ const router = express.Router()
 router.post(
   '/create-user',
   validateRequest(userValidation.createUserZodSchema),
-  userController.createStudent,
+  userController.createUser,
 )
 
 router.get('/:id', userController.getSingleUser)

@@ -14,11 +14,19 @@ const createUserZodSchema = z.object({
     email: z.string({
       required_error: 'Email is required',
     }),
+    contactNo: z.string({
+      required_error: 'Contact number is required',
+    }),
     password: z.string({
       required_error: 'Password is required',
     }),
-    role: z.enum(['admin', 'super-admin', 'volunteer', 'donor']).optional(),
-    profileImage: z.string().optional(),
+    role: z.enum(['admin', 'super-admin', 'volunteer', 'donor']),
+    profileImage: z.string({
+      required_error: 'Profile image is required',
+    }),
+    address: z.string({
+      required_error: 'Address is required',
+    }),
   }),
 })
 
