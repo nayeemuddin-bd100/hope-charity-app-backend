@@ -1,24 +1,88 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes'
-import { SortOrder } from 'mongoose'
+import mongoose, { SortOrder } from 'mongoose'
 import ApiError from '../../../errors/ApiError'
 import { paginationHelper } from '../../../helper/paginationHelper'
 import { ISearchTerm, searchHelper } from '../../../helper/searchHelper'
 import { IGenericResponse, IPaginationOptions } from '../../interfaces/common'
+import { IAdmin } from '../admin/admin.interface'
+import { Admin } from '../admin/admin.model'
 import { userSearchableFields } from './user.constant'
-import { IUser, IUserFilters } from './user.interface'
+import { IUser, IUserFilters, UserData } from './user.interface'
 import { User } from './user.model'
 
-const createUser = async (userData: IUser): Promise<IUser | null> => {
+const createUser = async (userData: UserData): Promise<IUser | null> => {
   // check if user already exists
   const isUserExist = await User.findOne({ email: userData.email })
   if (isUserExist) {
     throw new ApiError(StatusCodes.CONFLICT, 'User already exist')
   }
 
-  // create new user
-  const user = await User.create(userData)
+  let newUser = null
 
-  return user
+  // create user/admin/volunteer/donor using transaction rollback
+  const session = await mongoose.startSession()
+
+  try {
+    session.startTransaction()
+
+    // create new user (transaction-1)
+    const user = await User.create([userData], { session })
+    if (!user.length) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user')
+    }
+
+    const newUserData: Partial<IAdmin> = {
+      name: {
+        firstName: userData.name.firstName,
+        lastName: userData.name.lastName,
+      },
+      email: userData.email,
+      profileImage: userData.profileImage,
+      contactNo: userData.contactNo,
+      address: userData.address,
+      user: user[0]._id,
+    }
+
+    // create new admin/volunteer/donor
+    const createParticipant = async (Model: mongoose.Model<any>) => {
+      // create new participant (admin/volunteer/donor) (transaction-2)
+      const participant = await Model.create([newUserData], { session })
+
+      if (!participant.length) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          `Failed to create ${userData.role}`,
+        )
+      }
+
+      // update user with participant reference (transaction-3)
+      newUser = await User.findByIdAndUpdate(
+        user[0]._id,
+        { [userData.role]: participant[0]._id },
+        { session, new: true },
+      )
+    }
+
+    if (userData.role === 'admin') {
+      await createParticipant(Admin)
+    } else {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role')
+    }
+
+    // else if(userData.role === 'volunteer'){
+    //   await createParticipant(Volunteer)
+    // }
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return newUser
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
 }
 
 const getAllUsers = async (

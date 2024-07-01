@@ -1,4 +1,5 @@
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
+import { IAdmin } from '../admin/admin.interface'
 
 export type IUser = {
   name: {
@@ -6,9 +7,11 @@ export type IUser = {
     lastName: string
   }
   email: string
-  profileImage?: string
   password: string
   role: 'admin' | 'super-admin' | 'volunteer' | 'donor'
+  admin?: Types.ObjectId | IAdmin
+  // donorId?:Types.ObjectId | IDonor
+  // volunteerId?: Types.ObjectId | IDonor
   createdAt: Date
   updatedAt: Date
 }
@@ -21,3 +24,6 @@ export type IUserFilters = {
   email?: string
   role?: string
 }
+
+export type UserData = IUser & Partial<IAdmin>
+// export type UserData = IUser & Partial<IAdmin | IDonor | IVolunteer>

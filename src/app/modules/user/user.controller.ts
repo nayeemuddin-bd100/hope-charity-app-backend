@@ -8,7 +8,7 @@ import { userFilterableFields } from './user.constant'
 import { IUser } from './user.interface'
 import { userService } from './user.service'
 
-const createStudent = catchAsync(async (req: Request, res: Response) => {
+const createUser = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body
 
   const result = await userService.createUser(userData)
@@ -51,7 +51,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const userController = {
-  createStudent,
+  createUser,
   getSingleUser,
   getAllUsers,
 }

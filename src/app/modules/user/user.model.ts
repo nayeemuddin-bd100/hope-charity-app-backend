@@ -17,13 +17,15 @@ const userSchema = new Schema<IUser, UserModel>(
       required: true,
     },
     email: { type: String, required: true, unique: true },
-    profileImage: { type: String },
     password: { type: String, required: true },
     role: {
       type: String,
       enum: ['admin', 'super-admin', 'volunteer', 'donor'],
       default: 'donor',
     },
+    admin: { type: Schema.Types.ObjectId, ref: 'Admin' },
+    // donor: { type: Schema.Types.ObjectId, ref: 'Donor' },
+    // volunteer: { type: Schema.Types.ObjectId, ref: 'Volunteer' },
   },
   {
     timestamps: true,
