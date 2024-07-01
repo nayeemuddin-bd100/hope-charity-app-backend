@@ -220,6 +220,6 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - createdAt
 - updatedAt
 
-## ERD Diagram
+## ER Diagram
 
-![ERD Diagram](./ERD_charity-management-app.drawio.png)
+![ER Diagram](./ERD_charity-management-app.drawio.png)
