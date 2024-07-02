@@ -3,8 +3,7 @@ import cors from 'cors'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import globalErrorHandler from './app/middleware/globalErrorHandler'
-import { userRoute } from './app/modules/user/user.route'
-// import routers from "./app/routes";
+import router from './app/routes'
 
 const app: Application = express()
 app.use(cors())
@@ -15,8 +14,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //app route
-app.use('/api/v1/users/', userRoute)
-// app.use("/api/v1", routers);
+app.use('/api/v1', router)
 
 app.get('/', (_req: Request, res: Response) => {
   res.send('Hello World!')
