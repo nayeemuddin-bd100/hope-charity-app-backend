@@ -2,6 +2,7 @@ import { ErrorRequestHandler } from 'express'
 import { ZodError } from 'zod'
 import config from '../../config'
 import ApiError from '../../errors/ApiError'
+import handleCastError from '../../errors/handleCastError'
 import handleZodError from '../../errors/handleZodError'
 import { IGenericErrorMsg } from '../interfaces/error'
 
@@ -19,6 +20,12 @@ const globalErrorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
     statusCode = simplifiedError?.statusCode
     message = simplifiedError?.message
     errorMessages = simplifiedError?.errorMessages
+  } else if (error.name === 'CastError') {
+    const simplifiedError = handleCastError(error)
+
+    statusCode = simplifiedError?.statusCode
+    message = simplifiedError?.message
+    errorMessages = simplifiedError?.errorMessages
   } else if (error instanceof ApiError) {
     statusCode = error?.statusCode
     message = error?.message
@@ -28,6 +35,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   }
 
   res.status(statusCode).json({
+    // error,
     success: false,
     message,
     errorMessages,
