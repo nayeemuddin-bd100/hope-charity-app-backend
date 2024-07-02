@@ -4,7 +4,7 @@ import catchAsync from '../../../shared/catchAsync'
 import pick from '../../../shared/pick'
 import sendResponse from '../../../shared/sendResponse'
 import { paginationFields } from '../../constant/paginationFields'
-import { userFilterableFields } from './user.constant'
+import { userFilterableFields } from '../../constant/userFilterableFields'
 import { IUser } from './user.interface'
 import { userService } from './user.service'
 
