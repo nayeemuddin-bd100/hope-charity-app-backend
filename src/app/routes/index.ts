@@ -1,6 +1,8 @@
 import express from 'express'
 import { adminRoute } from '../modules/admin/admin.route'
+import { donorRoute } from '../modules/donor/donor.route'
 import { userRoute } from '../modules/user/user.route'
+import { volunteerRoute } from '../modules/volunteer/volunteer.route'
 
 const router = express.Router()
 
@@ -12,6 +14,14 @@ const moduleRoute = [
   {
     path: '/admin',
     route: adminRoute,
+  },
+  {
+    path: '/donor',
+    route: donorRoute,
+  },
+  {
+    path: '/volunteer',
+    route: volunteerRoute,
   },
 ]
 
