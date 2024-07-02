@@ -22,11 +22,16 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  // pick search and pagination fields
+  // pick search and pagination and selected fields
   const filter = pick(req.query, userFilterableFields)
   const paginationOption = pick(req.query, paginationFields)
+  const selectFields = pick(req.query, ['fields'])
 
-  const result = await userService.getAllUsers(filter, paginationOption)
+  const result = await userService.getAllUsers(
+    filter,
+    paginationOption,
+    selectFields.fields as string,
+  )
 
   sendResponse<IUser[]>(res, {
     statusCode: StatusCodes.OK,

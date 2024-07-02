@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes'
-import mongoose, { SortOrder } from 'mongoose'
+import mongoose from 'mongoose'
 import ApiError from '../../../errors/ApiError'
-import { paginationHelper } from '../../../helper/paginationHelper'
-import { ISearchTerm, searchHelper } from '../../../helper/searchHelper'
+import { queryHelper } from '../../../helper/queryHelper'
 import { IGenericResponse, IPaginationOptions } from '../../interfaces/common'
 import { IAdmin } from '../admin/admin.interface'
 import { Admin } from '../admin/admin.model'
@@ -89,34 +88,121 @@ const createUser = async (userData: IUserData): Promise<IUser | null> => {
   }
 }
 
+// const getAllUsers = async (
+//   filter: IUserFilters,
+//   paginationOptions: IPaginationOptions,
+// ): Promise<IGenericResponse<IUser[]> | null> => {
+//   const { searchTerm, ...filterData } = filter
+//   const { page, limit, skip, sortBy, sortOrder } =
+//     paginationHelper.calculatePagination(paginationOptions)
+
+//   // add search condition (name,role,email)
+//   // const andCondition = searchHelper.searchCondition(
+//   //   searchTerm as ISearchTerm,
+//   //   filterData,
+//   //   userSearchableFields,
+//   // )
+
+//   const userSearchableFields = [
+//     'name.firstName',
+//     'name.lastName',
+//     'email',
+//     'role',
+//   ]
+//   // andCondition = [
+//   //   {
+//   //     $or: [
+//   //       { email: { $regex: "test@gmail.com", $options: "i" } },
+//   //       { role: { $regex: "test@gmail.com", $options: "i" } },
+//   //       { name.firstName: { $regex: "test@gmail.com", $options: "i" } },
+//   //       { name.lastName: { $regex: "test@gmail.com", $options: "i" } },
+//   //     ]
+//   //   }
+//   // ]
+
+//   const andCondition = []
+//   if (searchTerm) {
+//     andCondition.push({
+//       $or: userSearchableFields.map(field => ({
+//         [field]: {
+//           $regex: searchTerm,
+//           $options: 'i',
+//         },
+//       })),
+//     })
+//   }
+
+//   // filtersData = { role: "admin", id: "12345" }
+//   // andCondition = [
+//   //   {
+//   //     $or: [
+//   //       { name: { $regex: "bob", $options: "i" } },
+//   //       { email: { $regex: "bob", $options: "i" } }
+//   //     ]
+//   //   },
+//   //   {
+//   //     $and: [
+//   //       { role: "admin" },
+//   //       { id: "12345" }
+//   //     ]
+//   //   }
+//   // ]
+
+//   if (Object.keys(filterData).length) {
+//     andCondition.push({
+//       $and: Object.entries(filterData).map(([field, value]) => ({
+//         [field]: value,
+//       })),
+//     })
+//   }
+
+//   // sort condition (createdAt,desc)
+//   const sortCondition: { [key: string]: SortOrder } = {}
+
+//   if (sortBy && sortOrder) {
+//     sortCondition[sortBy] = sortOrder
+//   }
+
+//   const whereCondition = andCondition.length > 0 ? { $and: andCondition } : {}
+
+//   const users = await User.find(whereCondition)
+//     .sort(sortCondition)
+//     .skip(skip)
+//     .limit(limit)
+//   const total = await User.countDocuments(whereCondition)
+
+//   return {
+//     meta: {
+//       page,
+//       limit,
+//       total,
+//     },
+//     data: users,
+//   }
+// }
+
 const getAllUsers = async (
   filter: IUserFilters,
   paginationOptions: IPaginationOptions,
+  selectFields?: string,
 ): Promise<IGenericResponse<IUser[]> | null> => {
-  const { searchTerm, ...filterData } = filter
-  const { page, limit, skip, sortBy, sortOrder } =
-    paginationHelper.calculatePagination(paginationOptions)
-
-  // add search condition (name,role,email)
-  const andCondition = searchHelper.searchCondition(
-    searchTerm as ISearchTerm,
-    filterData,
+  const queryCondition = await queryHelper(
+    filter,
+    paginationOptions,
     userSearchableFields,
+    selectFields,
   )
 
-  // sort condition (createdAt,desc)
-  const sortCondition: { [key: string]: SortOrder } = {}
+  const { whereCondition, sortCondition, skip, limit, selectCondition, page } =
+    queryCondition
 
-  if (sortBy && sortOrder) {
-    sortCondition[sortBy] = sortOrder
-  }
-
-  const whereCondition = andCondition.length > 0 ? { $and: andCondition } : {}
-
-  const users = await User.find(whereCondition)
+  const result = await User.find(whereCondition)
     .sort(sortCondition)
     .skip(skip)
     .limit(limit)
+    .select(selectCondition)
+    .lean()
+
   const total = await User.countDocuments(whereCondition)
 
   return {
@@ -125,7 +211,7 @@ const getAllUsers = async (
       limit,
       total,
     },
-    data: users,
+    data: result,
   }
 }
 
