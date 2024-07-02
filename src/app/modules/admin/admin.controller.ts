@@ -31,8 +31,11 @@ const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleAdmin = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id
-
-  const result = await adminService.getSingleAdmin(id)
+  const selectFields = pick(req.query, ['fields'])
+  const result = await adminService.getSingleAdmin(
+    id,
+    selectFields.fields as string,
+  )
 
   sendResponse<IAdmin>(res, {
     statusCode: StatusCodes.OK,
@@ -56,8 +59,22 @@ const updateAdmin = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+
+  await adminService.deleteAdmin(id)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Admin Deleted successfully',
+    data: null,
+  })
+})
+
 export const adminController = {
   getSingleAdmin,
   getAllAdmin,
   updateAdmin,
+  deleteAdmin,
 }

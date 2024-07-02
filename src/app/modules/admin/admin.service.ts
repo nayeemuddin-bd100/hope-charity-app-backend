@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
 import ApiError from '../../../errors/ApiError'
 import { queryHelper } from '../../../helper/queryHelper'
+import { selectHelper } from '../../../helper/selectHelper'
 import { userSearchableFields } from '../../constant/userSearchableFields'
 import { IGenericResponse, IPaginationOptions } from '../../interfaces/common'
 import { IUser, IUserFilters } from '../user/user.interface'
@@ -44,8 +45,12 @@ const getAllAdmin = async (
   }
 }
 
-const getSingleAdmin = async (id: string): Promise<IAdmin | null> => {
-  const admin = await Admin.findById(id)
+const getSingleAdmin = async (
+  id: string,
+  selectFields?: string,
+): Promise<IAdmin | null> => {
+  const selectCondition = selectHelper(selectFields)
+  const admin = await Admin.findById(id).select(selectCondition)
 
   if (!admin) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Admin not found')
@@ -121,8 +126,39 @@ const updateAdmin = async (
   }
 }
 
+const deleteAdmin = async (id: string): Promise<void> => {
+  // check admin is exist
+  const admin = await Admin.findById(id)
+  if (!admin) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Admin not found')
+  }
+
+  const session = await mongoose.startSession()
+  try {
+    session.startTransaction()
+
+    //delete admin
+    const admin = await Admin.findByIdAndDelete(id, { session })
+    if (!admin) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete admin')
+    }
+    // delete user
+    const user = await User.deleteOne({ admin: id }, { session })
+    if (user.deletedCount === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete user')
+    }
+    await session.commitTransaction()
+    session.endSession()
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
+}
+
 export const adminService = {
   getAllAdmin,
   getSingleAdmin,
   updateAdmin,
+  deleteAdmin,
 }

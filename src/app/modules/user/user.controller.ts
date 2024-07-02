@@ -44,8 +44,12 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id
+  const selectFields = pick(req.query, ['fields'])
 
-  const result = await userService.getSingleUser(id)
+  const result = await userService.getSingleUser(
+    id,
+    selectFields.fields as string,
+  )
 
   sendResponse<IUser>(res, {
     statusCode: StatusCodes.OK,
