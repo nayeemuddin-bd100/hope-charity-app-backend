@@ -113,8 +113,62 @@ const changePassword = async (
   await isUserExist.save()
 }
 
+const forgetPassword = async (email: string) => {
+  //   Check user is exist
+  const isUserExist = await User.isUserExist(email)
+  if (!isUserExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, ' User does not found')
+  }
+
+  const { _id, email: loginUserEmail, role } = isUserExist
+
+  const resetToken = jwtHelpers.createToken(
+    { _id, email: loginUserEmail, role },
+    config.jwt.secret as Secret,
+    '10m',
+  )
+  const resetUILink = `${config.reset_ui_base_url}?email=${email}&token=${resetToken}`
+
+  //   will be used in production
+  //   const resetUIBody = resetUI(resetUILink)
+  //   sendEmail(loginUserEmail, resetUIBody)
+  return resetUILink
+}
+
+const resetPassword = async (
+  payload: { email: string; newPassword: string },
+  token: string,
+) => {
+  // Verify token
+  let verifiedToken = null
+  try {
+    verifiedToken = jwtHelpers.verifyToken(token, config.jwt.secret as Secret)
+  } catch (err) {
+    throw new ApiError(StatusCodes.FORBIDDEN, 'Invalid token')
+  }
+  const { _id, email: loginUserEmail } = verifiedToken
+
+  // Check user is exist
+  const isUserExist = await User.findById(_id).select('+password')
+  if (!isUserExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+  }
+
+  // check user is same
+  const isSameUser = payload?.email === loginUserEmail
+  if (!isSameUser) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized access')
+  }
+
+  // Update password
+  isUserExist.password = payload?.newPassword
+  await isUserExist.save()
+}
+
 export const authService = {
   loginUser,
   refreshToken,
   changePassword,
+  forgetPassword,
+  resetPassword,
 }

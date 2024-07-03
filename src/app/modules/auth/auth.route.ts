@@ -31,4 +31,16 @@ router.patch(
   authController.changePassword,
 )
 
+router.post(
+  '/forget-password',
+  validateRequest(authValidation.forgetPasswordZodSchema),
+  authController.forgetPassword,
+)
+
+router.post(
+  '/reset-password',
+  validateRequest(authValidation.resetPasswordZodSchema),
+  authController.resetPassword,
+)
+
 export const authRoute = router
