@@ -178,6 +178,28 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - createdAt
 - updatedAt
 
+#### Cause
+
+- \_id (Primary Key)
+- title
+- description
+- goalAmount
+- raisedAmount
+- image
+- createdBy: adminId (foreign key)
+- createdAt
+- updatedAt
+
+#### Donation
+
+- \_id (Primary Key)
+- amount
+- date
+- donorId (foreign key)
+- causeId (foreign key)
+- createdAt
+- updatedAt
+
 #### Event
 
 - \_id (Primary Key)
@@ -199,27 +221,6 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - description
 - image
 - author: [adminId (foreign key) | volunteerId (foreign key)]
-- createdAt
-- updatedAt
-
-#### Donation
-
-- \_id (Primary Key)
-- amount
-- date
-- donorId (foreign key)
-- causeId (foreign key)
-- createdAt
-- updatedAt
-
-#### Cause
-
-- \_id (Primary Key)
-- title
-- description
-- goalAmount
-- raisedAmount
-- createdBy: adminId (foreign key)
 - createdAt
 - updatedAt
 
