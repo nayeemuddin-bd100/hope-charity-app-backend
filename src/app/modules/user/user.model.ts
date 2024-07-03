@@ -37,6 +37,35 @@ const userSchema = new Schema<IUser, UserModel>(
   },
 )
 
+// static Method
+//checking if user exists
+userSchema.statics.isUserExist = async function (
+  email: string,
+): Promise<
+  (Pick<IUser, 'email' | 'password' | 'role'> & { _id: string }) | null
+> {
+  const user = await User.findOne(
+    { email },
+    { _id: 1, email: 1, password: 1, role: 1 },
+  )
+
+  return user as
+    | (Pick<IUser, 'email' | 'password' | 'role'> & { _id: string })
+    | null
+}
+
+// checking password
+userSchema.statics.isPasswordMatch = async function (
+  givenPassword: string,
+  savedPassword: string,
+): Promise<boolean> {
+  const isPasswordMatched = await bcrypt.compare(givenPassword, savedPassword)
+
+  return isPasswordMatched
+}
+
+// hook
+
 // hash password before saving
 userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(

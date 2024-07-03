@@ -18,7 +18,21 @@ export type IUser = {
   updatedAt: Date
 }
 
-export type UserModel = Model<IUser, Record<string, never>>
+// export type UserModel = Model<IUser, Record<string, never>>
+export type UserModel = {
+  // static method for checking if user exists
+  isUserExist(
+    email: string,
+  ): Promise<
+    (Pick<IUser, 'email' | 'password' | 'role'> & { _id: string }) | null
+  >
+
+  // static method for checking password
+  isPasswordMatch(
+    givenPassword: string,
+    savedPassword: string,
+  ): Promise<boolean>
+} & Model<IUser>
 
 export type IUserFilters = {
   searchTerm?: string
