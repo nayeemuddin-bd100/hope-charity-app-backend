@@ -2,10 +2,17 @@ import { StatusCodes } from 'http-status-codes'
 import { ObjectId } from 'mongodb'
 import mongoose from 'mongoose'
 import ApiError from '../../../errors/ApiError'
-import { CustomJwtPayload } from '../../interfaces/common'
+import { queryHelper } from '../../../helper/queryHelper'
+import { selectHelper } from '../../../helper/selectHelper'
+import {
+  CustomJwtPayload,
+  IGenericResponse,
+  IPaginationOptions,
+} from '../../interfaces/common'
 import { Admin } from '../admin/admin.model'
 import { User } from '../user/user.model'
-import { ICause, ICauseData } from './cause.interface'
+import { causeSearchableFields } from './cause.constant'
+import { ICause, ICauseData, ICauseFilters } from './cause.interface'
 import { Cause } from './cause.model'
 
 const createCause = async (
@@ -76,6 +83,121 @@ const createCause = async (
   return Cause.findById(cause?._id).populate('createdBy')
 }
 
+const getAllCauses = async (
+  filter: ICauseFilters,
+  paginationOptions: IPaginationOptions,
+  selectFields?: string,
+): Promise<IGenericResponse<ICause[]> | null> => {
+  const queryCondition = await queryHelper(
+    filter,
+    paginationOptions,
+    causeSearchableFields,
+    selectFields,
+  )
+
+  const { whereCondition, sortCondition, selectCondition, skip, limit, page } =
+    queryCondition
+
+  const result = await Cause.find(whereCondition)
+    .sort(sortCondition)
+    .skip(skip)
+    .limit(limit)
+    .select(selectCondition)
+    .lean()
+    .populate('createdBy')
+
+  const total = await Cause.countDocuments(whereCondition)
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  }
+}
+
+const getSingleCause = async (
+  id: string,
+  selectFields?: string,
+): Promise<ICause | null> => {
+  const selectCondition = selectHelper(selectFields)
+  const cause = await Cause.findById(id)
+    .select(selectCondition)
+    .populate('createdBy')
+
+  if (!cause) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Cause not found')
+  }
+
+  return cause
+}
+
+const updateCause = async (
+  id: string,
+  payload: Partial<ICause>,
+): Promise<ICause | null> => {
+  // check cause is exist
+  const isCauseExist = await Cause.findById(id)
+  if (!isCauseExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Cause not found')
+  }
+
+  const updatedCauseData: Partial<ICause> = {
+    title: payload?.title,
+    description: payload?.description,
+    goalAmount: payload?.goalAmount,
+    raisedAmount: payload?.raisedAmount,
+    image: payload?.image,
+  }
+  const updatedCause = await Cause.findByIdAndUpdate(id, updatedCauseData, {
+    new: true,
+  })
+
+  return updatedCause
+}
+
+const deleteCause = async (id: string): Promise<void> => {
+  // check cause is exist
+  const cause = await Cause.findById(id)
+  if (!cause) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Cause not found')
+  }
+
+  const session = await mongoose.startSession()
+  try {
+    session.startTransaction()
+
+    //delete cause
+    const cause = await Cause.findByIdAndDelete(id, { session })
+    if (!cause) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete cause')
+    }
+    // delete cause reference from admin
+    const updatedAdmin = await Admin.findOneAndUpdate(
+      { causes: id },
+      { $pull: { causes: id } },
+      { session, new: true },
+    )
+
+    if (!updatedAdmin) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update admin')
+    }
+
+    await session.commitTransaction()
+    session.endSession()
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
+}
+
 export const causeService = {
   createCause,
+  getAllCauses,
+  getSingleCause,
+  updateCause,
+  deleteCause,
 }

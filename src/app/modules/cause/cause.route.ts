@@ -14,4 +14,19 @@ router.post(
   causeController.createCause,
 )
 
+router.get('/:id', causeController.getSingleCause)
+router.patch(
+  '/:id',
+  validateRequest(causeValidation.updateCauseZodSchema),
+  auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN),
+  causeController.updateCause,
+)
+router.delete(
+  '/:id',
+  auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN),
+  causeController.deleteCause,
+)
+
+router.get('/', causeController.getAllCauses)
+
 export const causeRoute = router
