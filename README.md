@@ -194,7 +194,6 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 
 - \_id (Primary Key)
 - amount
-- date
 - donorId (foreign key)
 - causeId (foreign key)
 - createdAt
@@ -210,7 +209,7 @@ The purpose of this document is to outline the requirements for Hope, a charity 
 - startTime
 - endTime
 - createdBy: adminId (foreign key)
-- volunteerId[]
+- assignedVolunteers: volunteerId[]
 - createdAt
 - updatedAt
 
