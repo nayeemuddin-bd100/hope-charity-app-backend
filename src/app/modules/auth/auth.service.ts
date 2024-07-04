@@ -1,8 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
-import { JwtPayload, Secret } from 'jsonwebtoken'
+import { Secret } from 'jsonwebtoken'
 import config from '../../../config'
 import ApiError from '../../../errors/ApiError'
 import { jwtHelpers } from '../../../helper/jwtHelper'
+import { CustomJwtPayload } from '../../interfaces/common'
 import { User } from '../user/user.model'
 import {
   IChangePassword,
@@ -82,9 +83,10 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
 }
 
 const changePassword = async (
-  user: JwtPayload | null,
+  user: CustomJwtPayload,
   passwordData: IChangePassword,
-  decodedRefreshToken: JwtPayload,
+  accessToken: string,
+  refreshToken: string,
 ): Promise<void> => {
   const { oldPassword, newPassword } = passwordData
 
@@ -94,10 +96,12 @@ const changePassword = async (
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
   }
 
-  const isLoggedInUser = user?._id === decodedRefreshToken?._id
-
-  // Check logged in user
-  if (!isLoggedInUser) {
+  // check user of refreshToken and accessToken is same
+  const isUserTokenMatch = await User.isUserTokenMatch(
+    accessToken,
+    refreshToken,
+  )
+  if (!isUserTokenMatch) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized access')
   }
   // Check old password
