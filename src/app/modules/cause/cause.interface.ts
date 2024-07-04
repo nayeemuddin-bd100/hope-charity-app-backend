@@ -20,3 +20,11 @@ export type ICauseFilters = {
   title?: string
   description?: string
 }
+
+export type ICauseData = {
+  title: string
+  description: string
+  goalAmount: number
+  raisedAmount: number
+  image: string
+}
