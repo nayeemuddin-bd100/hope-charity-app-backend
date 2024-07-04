@@ -19,19 +19,24 @@ export type IUser = {
 }
 
 // export type UserModel = Model<IUser, Record<string, never>>
+
+//static method with export model
 export type UserModel = {
-  // static method for checking if user exists
+  //  checking if user exists
   isUserExist(
     email: string,
   ): Promise<
     (Pick<IUser, 'email' | 'password' | 'role'> & { _id: string }) | null
   >
 
-  // static method for checking password
+  //  checking password
   isPasswordMatch(
     givenPassword: string,
     savedPassword: string,
   ): Promise<boolean>
+
+  //checking user of refreshToken and accessToken is same
+  isUserTokenMatch(accessToken: string, refreshToken: string): Promise<boolean>
 } & Model<IUser>
 
 export type IUserFilters = {

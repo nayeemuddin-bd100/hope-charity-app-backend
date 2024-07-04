@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt'
+import { Secret } from 'jsonwebtoken'
 import { Schema, model } from 'mongoose'
 import config from '../../../config'
+import { jwtHelpers } from '../../../helper/jwtHelper'
 import { IUser, UserModel } from './user.interface'
 
 const userSchema = new Schema<IUser, UserModel>(
@@ -64,8 +66,30 @@ userSchema.statics.isPasswordMatch = async function (
   return isPasswordMatched
 }
 
-// hook
+// checking user of refreshToken and accessToken is same
+userSchema.statics.isUserTokenMatch = async function (
+  accessToken: string,
+  refreshToken: string,
+): Promise<boolean> {
+  //access token
+  const decodedAccessToken = jwtHelpers.verifyToken(
+    accessToken,
+    config.jwt.secret as Secret,
+  )
 
+  //refresh token
+  const decodedRefreshToken = jwtHelpers.verifyToken(
+    refreshToken,
+    config.jwt.refresh_secret as Secret,
+  )
+
+  //decoded token response => _id, loginUserEmail,role
+
+  //check user is same
+  return decodedAccessToken?._id === decodedRefreshToken?._id
+}
+
+// hook
 // hash password before saving
 userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(
