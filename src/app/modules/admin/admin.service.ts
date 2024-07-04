@@ -50,7 +50,9 @@ const getSingleAdmin = async (
   selectFields?: string,
 ): Promise<IAdmin | null> => {
   const selectCondition = selectHelper(selectFields)
-  const admin = await Admin.findById(id).select(selectCondition)
+  const admin = await Admin.findById(id)
+    .select(selectCondition)
+    .populate('causes')
 
   if (!admin) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Admin not found')
