@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jsonwebtoken'
 import { IGenericErrorMsg } from './error'
 
 export type IGenericResponse<T> = {
@@ -21,3 +22,9 @@ export type IPaginationOptions = {
   sortBy?: 'createdAt' | 'updatedAt'
   sortOrder?: 'asc' | 'desc'
 }
+
+export type CustomJwtPayload = {
+  _id: string
+  loginUserEmail: string
+  role: string
+} & JwtPayload
