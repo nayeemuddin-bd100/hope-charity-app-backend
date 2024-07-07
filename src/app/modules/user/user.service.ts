@@ -22,6 +22,16 @@ const createUser = async (userData: IUserData): Promise<IUser | null> => {
     throw new ApiError(StatusCodes.CONFLICT, 'Email is already exist')
   }
 
+  //set default role and profile image
+  if (!userData.role) {
+    userData.role = 'donor'
+  }
+
+  if (!userData.profileImage) {
+    userData.profileImage =
+      'https://www.shutterstock.com/image-vector/brunette-young-man-profile-avatar-600nw-1776474860.jpg'
+  }
+
   let newUser = null
 
   // create user/admin/volunteer/donor using transaction rollback

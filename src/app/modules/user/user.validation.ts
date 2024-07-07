@@ -21,9 +21,11 @@ const createUserZodSchema = z.object({
       required_error: 'Password is required',
     }),
     role: z.enum(['admin', 'super-admin', 'volunteer', 'donor']),
-    profileImage: z.string({
-      required_error: 'Profile image is required',
-    }),
+    profileImage: z
+      .string({
+        required_error: 'Profile image is required',
+      })
+      .optional(),
     address: z.string({
       required_error: 'Address is required',
     }),
