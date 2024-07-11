@@ -49,7 +49,7 @@ const createCause = async (
       title: payload?.title,
       description: payload?.description,
       goalAmount: payload?.goalAmount,
-      raisedAmount: payload?.raisedAmount,
+      raisedAmount: 0,
       image: payload?.image,
       createdBy: admin?._id,
     }
