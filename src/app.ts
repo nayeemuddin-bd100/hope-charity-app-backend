@@ -6,7 +6,14 @@ import globalErrorHandler from './app/middleware/globalErrorHandler'
 import router from './app/routes'
 
 const app: Application = express()
-app.use(cors())
+// app.use(cors())
+
+app.use(
+  cors({
+    origin: ['https://hope-charity-app.vercel.app', 'http://localhost:3000'],
+    credentials: true,
+  }),
+)
 app.use(cookieParser())
 
 //parser

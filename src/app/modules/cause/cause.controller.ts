@@ -12,7 +12,7 @@ import { causeService } from './cause.service'
 const createCause = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as CustomJwtPayload
   const accessToken = req?.headers?.authorization || ''
-  const refreshToken = req.cookies.refreshToken || ''
+  const refreshToken = req?.cookies?.refreshToken || ''
   const causeData = req?.body
 
   const result = await causeService.createCause(
