@@ -140,6 +140,7 @@ const updateCause = async (
 ): Promise<ICause | null> => {
   // check cause is exist
   const isCauseExist = await Cause.findById(id)
+  console.log('🚀 ~ isCauseExist:', isCauseExist)
   if (!isCauseExist) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Cause not found')
   }
@@ -151,6 +152,19 @@ const updateCause = async (
     raisedAmount: payload?.raisedAmount,
     image: payload?.image,
   }
+
+  // check goal amount is greater than raised amount
+
+  if (
+    !!payload?.goalAmount &&
+    isCauseExist.raisedAmount > payload?.goalAmount
+  ) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Goal amount can not be less than raised amount',
+    )
+  }
+
   const updatedCause = await Cause.findByIdAndUpdate(id, updatedCauseData, {
     new: true,
   })
