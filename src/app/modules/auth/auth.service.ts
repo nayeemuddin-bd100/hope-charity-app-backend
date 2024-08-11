@@ -3,6 +3,8 @@ import { Secret } from 'jsonwebtoken'
 import config from '../../../config'
 import ApiError from '../../../errors/ApiError'
 import { jwtHelpers } from '../../../helper/jwtHelper'
+import resetUI from '../../../shared/resetUI'
+import { sendEmail } from '../../../shared/sendEmail'
 import { CustomJwtPayload } from '../../interfaces/common'
 import { User } from '../user/user.model'
 import {
@@ -134,8 +136,8 @@ const forgetPassword = async (email: string) => {
   const resetUILink = `${config.reset_ui_base_url}?email=${email}&token=${resetToken}`
 
   //   will be used in production
-  //   const resetUIBody = resetUI(resetUILink)
-  //   sendEmail(loginUserEmail, resetUIBody)
+  const resetUIBody = resetUI(resetUILink)
+  sendEmail(loginUserEmail, resetUIBody)
   return resetUILink
 }
 
