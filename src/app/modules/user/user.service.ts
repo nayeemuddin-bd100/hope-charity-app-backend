@@ -5,6 +5,7 @@ import ApiError from '../../../errors/ApiError'
 import { queryHelper } from '../../../helper/queryHelper'
 import { selectHelper } from '../../../helper/selectHelper'
 import { userSearchableFields } from '../../constant/userSearchableFields'
+import { USER_ROLE } from '../../enum/user'
 import { IGenericResponse, IPaginationOptions } from '../../interfaces/common'
 import { IAdmin } from '../admin/admin.interface'
 import { Admin } from '../admin/admin.model'
@@ -147,8 +148,32 @@ const getSingleUser = async (
   return users
 }
 
+const getMe = async (
+  loginUserEmail: string,
+  role: string,
+): Promise<IAdmin | IDonor | IVolunteer | null> => {
+  let result = null
+
+  if (role === USER_ROLE.SUPER_ADMIN) {
+    result = await Admin.findOne({ email: loginUserEmail })
+  }
+
+  if (role === USER_ROLE.ADMIN) {
+    result = await Admin.findOne({ email: loginUserEmail })
+  }
+  if (role === USER_ROLE.VOLUNTEER) {
+    result = await Volunteer.findOne({ email: loginUserEmail })
+  }
+
+  if (role === USER_ROLE.DONOR) {
+    result = await Donor.findOne({ email: loginUserEmail })
+  }
+  return result
+}
+
 export const userService = {
   createUser,
   getAllUsers,
   getSingleUser,
+  getMe,
 }

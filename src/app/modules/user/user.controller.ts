@@ -5,6 +5,10 @@ import pick from '../../../shared/pick'
 import sendResponse from '../../../shared/sendResponse'
 import { paginationFields } from '../../constant/paginationFields'
 import { userFilterableFields } from '../../constant/userFilterableFields'
+import { CustomJwtPayload } from '../../interfaces/common'
+import { IAdmin } from '../admin/admin.interface'
+import { IDonor } from '../donor/donor.interface'
+import { IVolunteer } from '../volunteer/volunteer.interface'
 import { IUser } from './user.interface'
 import { userService } from './user.service'
 
@@ -59,8 +63,21 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getMe = catchAsync(async (req, res) => {
+  const { loginUserEmail, role } = req.user as CustomJwtPayload
+  const result = await userService.getMe(loginUserEmail, role)
+
+  sendResponse<IAdmin | IVolunteer | IDonor | null>(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'User retrieved successfully',
+    data: result,
+  })
+})
+
 export const userController = {
   createUser,
   getSingleUser,
   getAllUsers,
+  getMe,
 }
