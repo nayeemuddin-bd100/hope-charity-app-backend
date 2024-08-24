@@ -58,7 +58,7 @@ const createDonation = async (
   if (raisedAmount > cause?.goalAmount) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Donation amount cannot be greater than goal amount',
+      'Donation amount cannot be greater than remaining amount',
     )
   }
 
