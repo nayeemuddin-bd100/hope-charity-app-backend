@@ -166,7 +166,12 @@ const getMe = async (
   }
 
   if (role === USER_ROLE.DONOR) {
-    result = await Donor.findOne({ email: loginUserEmail })
+    result = await Donor.findOne({ email: loginUserEmail }).populate({
+      path: 'donation', // Populate the donation within each donor
+      populate: {
+        path: 'cause', // Populate the cause within each donation
+      },
+    })
   }
   return result
 }
