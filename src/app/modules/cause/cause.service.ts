@@ -10,6 +10,8 @@ import {
   IPaginationOptions,
 } from '../../interfaces/common'
 import { Admin } from '../admin/admin.model'
+import { Donation } from '../donation/donation.model'
+import { Donor } from '../donor/donor.model'
 import { User } from '../user/user.model'
 import { causeSearchableFields } from './cause.constant'
 import { ICause, ICauseData, ICauseFilters } from './cause.interface'
@@ -140,7 +142,6 @@ const updateCause = async (
 ): Promise<ICause | null> => {
   // check cause is exist
   const isCauseExist = await Cause.findById(id)
-  console.log('🚀 ~ isCauseExist:', isCauseExist)
   if (!isCauseExist) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Cause not found')
   }
@@ -188,6 +189,7 @@ const deleteCause = async (id: string): Promise<void> => {
     if (!cause) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete cause')
     }
+
     // delete cause reference from admin
     const updatedAdmin = await Admin.findOneAndUpdate(
       { causes: id },
@@ -197,6 +199,31 @@ const deleteCause = async (id: string): Promise<void> => {
 
     if (!updatedAdmin) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update admin')
+    }
+
+    // Delete all donations related to the cause
+    const donations = await Donation.find({ cause: id }).session(session)
+
+    const deletedDonations = await Donation.deleteMany(
+      { cause: id },
+      { session },
+    )
+
+    if (!deletedDonations) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete donations')
+    }
+
+    // Update donors to remove the donations related to the deleted cause
+    const donorIds = donations.map(donation => donation.donor)
+
+    const updatedDonors = await Donor.updateMany(
+      { _id: { $in: donorIds } },
+      { $pull: { donation: { $in: donations.map(d => d._id) } } },
+      { session },
+    )
+
+    if (!updatedDonors) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update donors')
     }
 
     await session.commitTransaction()
